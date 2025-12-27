@@ -1,0 +1,45 @@
+﻿<Application x:Class="Kuro_DockLauncher2.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Kuro_DockLauncher2"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <Storyboard x:Key="SlideInFromRightStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                         To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Storyboard x:Key="SlideOutToRightStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                         To="89" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Style x:Key="SlideAnimation">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="StackPanel.MouseEnter">
+                    <BeginStoryboard Storyboard="{StaticResource SlideInFromRightStoryboard}"/>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="StackPanel.DragEnter">
+                    <BeginStoryboard Storyboard="{StaticResource SlideInFromRightStoryboard}"/>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="ContextMenu.Opened">
+                    <BeginStoryboard Storyboard="{StaticResource SlideInFromRightStoryboard}"/>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="StackPanel.MouseLeave">
+                    <BeginStoryboard Storyboard="{StaticResource SlideOutToRightStoryboard}"/>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="StackPanel.DragLeave">
+                    <BeginStoryboard Storyboard="{StaticResource SlideOutToRightStoryboard}"/>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </Application.Resources>
+
+</Application>
