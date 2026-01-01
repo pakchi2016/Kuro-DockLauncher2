@@ -21,21 +21,22 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
-        <Style x:Key="SlideAnimation">
+        <Style x:Key="SlideAnimation" TargetType="FrameworkElement">
             <Style.Triggers>
-                <EventTrigger RoutedEvent="StackPanel.MouseEnter">
+                <EventTrigger RoutedEvent="MouseEnter">
                     <BeginStoryboard Storyboard="{StaticResource SlideInFromRightStoryboard}"/>
                 </EventTrigger>
-                <EventTrigger RoutedEvent="StackPanel.DragEnter">
+                <EventTrigger RoutedEvent="DragEnter">
                     <BeginStoryboard Storyboard="{StaticResource SlideInFromRightStoryboard}"/>
                 </EventTrigger>
                 <EventTrigger RoutedEvent="ContextMenu.Opened">
                     <BeginStoryboard Storyboard="{StaticResource SlideInFromRightStoryboard}"/>
                 </EventTrigger>
-                <EventTrigger RoutedEvent="StackPanel.MouseLeave">
+
+                <EventTrigger RoutedEvent="MouseLeave">
                     <BeginStoryboard Storyboard="{StaticResource SlideOutToRightStoryboard}"/>
                 </EventTrigger>
-                <EventTrigger RoutedEvent="StackPanel.DragLeave">
+                <EventTrigger RoutedEvent="DragLeave">
                     <BeginStoryboard Storyboard="{StaticResource SlideOutToRightStoryboard}"/>
                 </EventTrigger>
             </Style.Triggers>

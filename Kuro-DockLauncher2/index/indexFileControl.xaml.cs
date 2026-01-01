@@ -15,14 +15,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace KuroDockLauncher.Index
+namespace KuroDockLauncher2.Index
 {
     /// <summary>
     /// IndexControl.xaml の相互作用ロジック
     /// </summary>
-    public partial class IndexControl : Window
+    
+    public partial class IndexFileControl : Window
     {
-        public IndexControl()
+        string index = "IndexFilePanel";
+        string middle = "FileMiddlePanel";
+        public IndexFileControl()
         {
             InitializeComponent();
         }
@@ -31,8 +34,11 @@ namespace KuroDockLauncher.Index
         {
             var mainwindow = Application.Current.MainWindow;
             if (mainwindow == null) { return; }
-            var panel = mainwindow.FindName("IndexPanel") as StackPanel;
-            var middlePanel = mainwindow.FindName("MiddlePanel") as StackPanel;
+
+            var panel = (StackPanel)mainwindow.FindName(index);
+            if (panel == null) { return; }
+
+            var middlePanel = (StackPanel)mainwindow.FindName(middle);
 
             string indexName = IndexNameTextBox.Text.Trim();
             Button IndexButton = new Button
@@ -45,8 +51,20 @@ namespace KuroDockLauncher.Index
             IndexButton.AllowDrop = true;
             IndexButton.Drop += Bookmark_Drop;
             IndexButton.MouseEnter += Bookmark_View;
-            panel?.Children.Add(IndexButton);
 
+            ContextMenu menu = new ContextMenu();
+            MenuItem removeItem = new MenuItem();
+            removeItem.Header = "ファイルインデックスボタン削除";
+            removeItem.Click += (s, args) =>
+            {
+                panel.Children.Remove(IndexButton);
+                middlePanel.Children.Clear();
+            };
+            menu.Items.Add(removeItem);
+            IndexButton.ContextMenu = menu;
+
+            int panelIndex = panel.Children.Count - 1;
+            panel.Children.Insert(panelIndex, IndexButton);
 
             this.DialogResult = true; // ダイアログを閉じて、OKが選択されたことを示す
             this.Close();
@@ -61,20 +79,28 @@ namespace KuroDockLauncher.Index
         private void Bookmark_Drop(object sender, DragEventArgs e)
         {
             Button button = (Button)sender;
-            List<string> pathList = new List<string>(); // Initialize the variable to fix CS0165
+
+            List<string> pathList = button.Tag as List<string> ?? new List<string>();
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 foreach (var file in files)
                 {
-                    if (System.IO.Directory.Exists(file) || System.IO.File.Exists(file))
-                    {
-                        // フォルダの場合の処理
-                        pathList.Add(file);
-                    }
+                    // ファイルの場合の処理
+                    if (File.Exists(file)) pathList.Add(file);
                 }
-                if (pathList != null) { button.Tag = pathList; }
-                ;
+                button.Tag = pathList;
+            }
+
+            var mainwindow = Application.Current.MainWindow;
+            var panel = (StackPanel)mainwindow.FindName(middle);
+            if (panel != null)
+            {
+                panel.Children.Clear();
+                foreach (string entry in pathList)
+                {
+                    AddFileButton(entry, panel);
+                }
             }
         }
 
@@ -84,13 +110,12 @@ namespace KuroDockLauncher.Index
             if (sender is Button indexButton && indexButton.Tag is List<string> pathList)
             {
                 if (pathList.Count == 0) { return; }
-                var panel = Application.Current.MainWindow.FindName("MiddlePanel") as StackPanel;
-                var sidepanel = Application.Current.MainWindow.FindName("FolderPulldown") as StackPanel;
+                var mainwindow = Application.Current.MainWindow;
+                var panel = (StackPanel)mainwindow.FindName(middle);
 
                 if (panel == null) { return; }
 
                 panel.Children.Clear();
-                sidepanel?.Children.Clear();
                 foreach (string entry in pathList)
                 {
                     AddBookmarkButton(entry, panel);
@@ -110,10 +135,6 @@ namespace KuroDockLauncher.Index
                 Content = System.IO.Path.GetFileName(item),
             };
 
-            if (Directory.Exists(item))
-            {
-                newbutton.MouseEnter += BookmarkButton_MouseOn;
-            }
             newbutton.Click += BookmarkButton_Click;
             panel.Children.Add(newbutton);
         }
@@ -142,30 +163,6 @@ namespace KuroDockLauncher.Index
                     UseShellExecute = true
                 }
             );
-        }
-
-        public static void BookmarkButton_MouseOn(object sender, RoutedEventArgs e)
-        {
-            var mainwindow = Application.Current.MainWindow;
-            if (mainwindow == null) { return; }
-            var panel = mainwindow.FindName("FolderPulldown") as StackPanel;
-
-            Button button = (Button)sender;
-            panel?.Children.Clear();
-            foreach (string entry in Directory.EnumerateFileSystemEntries((string)button.Tag))
-            {
-                Button newButton = new Button
-                {
-                    Width = 90,
-                    Height = 30,
-                    Margin = new Thickness(0, 1, 0, 0),
-                    Content = System.IO.Path.GetFileName(entry),
-                    Tag = entry
-                };
-                panel?.Children.Add(newButton);
-                newButton.Click += BookmarkButton_Click;
-
-            }
         }
     }
 }
