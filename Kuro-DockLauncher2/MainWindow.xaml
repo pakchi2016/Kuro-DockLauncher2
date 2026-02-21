@@ -3,14 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="KuroDock" 
         Width="300"
-        
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
         Topmost="True" 
         Background="Transparent"
-        Loaded="Window_Loaded">
+        AllowDrop="True"
+        DragEnter="Window_DragEnter"
+        Loaded="Window_Loaded"
+        MouseEnter="Window_MouseEnter"
+        MouseLeave="Window_MouseLeave">
 
     <Grid>
         <Grid HorizontalAlignment="Right">

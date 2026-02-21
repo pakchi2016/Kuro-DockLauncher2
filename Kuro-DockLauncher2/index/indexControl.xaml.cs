@@ -58,10 +58,13 @@ namespace KuroDockLauncher.Index
             this.Close();
         }
 
-        private void Bookmark_Drop(object sender, DragEventArgs e)
+        public static void Bookmark_Drop(object sender, DragEventArgs e)
         {
             Button button = (Button)sender;
-            List<string> pathList = new List<string>(); // Initialize the variable to fix CS0165
+
+            // ボタンのTagから既存のリストを取得します。まだ何も登録されていなければ、新規作成しますわ。
+            List<string> pathList = button.Tag as List<string> ?? new List<string>();
+
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -69,16 +72,20 @@ namespace KuroDockLauncher.Index
                 {
                     if (System.IO.Directory.Exists(file) || System.IO.File.Exists(file))
                     {
-                        // フォルダの場合の処理
-                        pathList.Add(file);
+                        // 既にリストに存在するかどうかを確認し、重複を防ぎます。
+                        if (!pathList.Contains(file))
+                        {
+                            pathList.Add(file);
+                        }
                     }
                 }
-                if (pathList != null) { button.Tag = pathList; }
-                ;
+
+                // データが追加されたリストを、再びTagに格納します。
+                button.Tag = pathList;
             }
         }
 
-        private void Bookmark_View(object sender, MouseEventArgs e)
+        public static void Bookmark_View(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed) { return; }
             if (sender is Button indexButton && indexButton.Tag is List<string> pathList)
